@@ -12,14 +12,14 @@ app.use(express.json());
 
 // Root route for quick test
 app.get('/', (req, res) => {
-  res.send('✅ Backend is working');
+  res.send(' Backend is working');
 });
 
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
-// <-- add this
+// testRoutes
 app.use('/', require('./routes/testRoutes'));
 
 const PORT = process.env.PORT || 5000;
