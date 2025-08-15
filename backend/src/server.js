@@ -10,17 +10,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Root route for quick test
-app.get('/', (req, res) => {
-  res.send(' Backend is working');
+// Root route for quick check
+app.get("/", (req, res) => {
+  res.send(" Backend is working");
 });
-
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/projects", require("./routes/projectRoutes"));
-// testRoutes
-app.use('/', require('./routes/testRoutes'));
+app.use("/api/chat", require("./routes/chatRoutes"));        
+app.use("/api/profile", require("./routes/profileRoutes"));  
+app.use("/test", require("./routes/testRoutes"));            
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
