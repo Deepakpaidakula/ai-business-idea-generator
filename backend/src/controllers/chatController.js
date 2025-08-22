@@ -1,42 +1,45 @@
 const Chat = require("../models/Chat");
+const User = require("../models/User");
 
-// Send a new chat message
-exports.sendMessage = async (req, res) => {
+
+const sendMessage = async (req, res) => {
   try {
-    const { receiver, message } = req.body;
+    const { message, to } = req.body;
 
-    if (!receiver || !message) {
-      return res.status(400).json({ success: false, message: "Receiver and message are required" });
+    if (!message || !to) {
+      return res.status(400).json({ success: false, error: "Message and recipient required" });
     }
 
-    const newMessage = new Chat({
-      sender: req.user._id,
-      receiver,
-      message
+    const chat = await Chat.create({
+      from: req.user._id,
+      to,
+      message,
     });
 
-    await newMessage.save();
-
-    res.json({ success: true, message: "Message sent", data: newMessage });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(201).json({ success: true, chat });
+  } catch (err) {
+    console.error("Send message error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 
-// Get all messages between logged-in user and another user
-exports.getMessages = async (req, res) => {
+
+const getMessages = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.params.userId;
 
     const messages = await Chat.find({
       $or: [
-        { sender: req.user._id, receiver: userId },
-        { sender: userId, receiver: req.user._id }
+        { from: req.user._id, to: userId },
+        { from: userId, to: req.user._id }
       ]
     }).sort({ createdAt: 1 });
 
-    res.json({ success: true, data: messages });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: true, messages });
+  } catch (err) {
+    console.error("Get messages error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
+module.exports = { sendMessage, getMessages };

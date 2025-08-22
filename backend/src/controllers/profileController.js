@@ -1,28 +1,28 @@
 const User = require("../models/User");
 
-// Get logged-in user's profile
-exports.getProfile = async (req, res) => {
+
+const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
-    res.json({ success: true, data: user });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error("Get profile error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 
-// Update logged-in user's profile
-exports.updateProfile = async (req, res) => {
+
+const updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const updates = req.body;
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, email },
-      { new: true }
-    ).select("-password");
+    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select("-password");
 
-    res.json({ success: true, data: updatedUser });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error("Update profile error:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
+
+module.exports = { getProfile, updateProfile };
